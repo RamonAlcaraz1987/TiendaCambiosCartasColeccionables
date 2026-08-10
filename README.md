@@ -1,51 +1,92 @@
-# MiProyecto
-MiProyecto - Tienda y Plataforma de Intercambio de Cartas Pokémon
+# 🃏 Tienda y Plataforma de Intercambio de Cartas Pokémon
 
-Descripción
+Aplicación web **MVC** hecha con **ASP.NET Core** que simula una tienda y plataforma de intercambio de cartas coleccionables Pokémon. Los usuarios pueden comprar cartas con puntos virtuales, armar colecciones y hacer intercambios entre sí, con un panel de administración completo por detrás.
 
-MiProyecto es una aplicación web basada en el modelo MVC (Modelo-Vista-Controlador) que permite a los usuarios gestionar, comprar e intercambiar cartas Pokémon. Los usuarios pueden crear colecciones, comprar cartas en una tienda virtual, realizar intercambios con otros usuarios y ver detalles de cartas y colecciones. La plataforma distingue entre dos roles: Administradores y Usuarios Comunes, con permisos diferenciados para garantizar una experiencia segura y controlada.
+## 🖼️ Vista previa
 
-Características Principales
+![Panel de edición de carta](docs/demo-editar-carta.png)
 
-Gestión de Usuarios:
-Administradores: Pueden realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre usuarios, cartas, colecciones y compras.
-Usuarios Comunes: Solo pueden editar su propio perfil (email, nombre, apellido, DNI, avatar) y gestionar sus puntos virtuales.
+*Panel de administración para editar cartas: nombre, categoría, tipos, precio, imagen y estado — con vista previa de la carta en tiempo real al estilo TCG.*
 
+## ✨ Funcionalidades
 
+- **Gestión de usuarios con dos roles**: Administradores (CRUD completo sobre usuarios, cartas, colecciones y compras) y Usuarios Comunes (gestionan su propio perfil y puntos virtuales).
+- **Tienda virtual**: compra de cartas con puntos virtuales, stock gestionado por el administrador.
+- **Sistema de intercambios**: los usuarios pueden ofrecer hasta 5 cartas por intercambio; el receptor acepta, rechaza o cancela, y el oferente confirma antes de que las cartas se transfieran. Solo puede haber un intercambio abierto por par de usuarios, con vencimiento por tiempo.
+- **Colecciones públicas**: cada usuario arma sus colecciones, visibles para otros usuarios.
+- **Packs de cartas**: apertura de sobres/packs (gestión vía `PackController`).
+- **Historial**: seguimiento de compras e intercambios propios.
+- **Autenticación dual**: cookies para el sitio web + JWT para la API (`Api/UsuarioApiController`), pensada para un futuro cliente externo (app mobile, etc.).
 
-Tienda Virtual:
-Los usuarios pueden comprar cartas usando puntos virtuales.
-Las cartas en la tienda tienen un precio definido y un stock ilimitado, gestionado por el administrador.
-Los administradores pueden agregar o retirar cartas de la tienda.
+## 🛠️ Stack tecnológico
 
+| Categoría | Tecnología |
+|---|---|
+| Backend | ASP.NET Core 8 (MVC + Web API) |
+| Lenguaje | C# |
+| Base de datos | MySQL |
+| ORM | Entity Framework Core + Pomelo.EntityFrameworkCore.MySql |
+| Autenticación | Cookie Authentication (web) + JWT Bearer (API) |
+| Vistas | Razor (.cshtml) |
+| Imágenes | LazZiya.ImageResize |
 
+## 📂 Estructura del proyecto
 
-Intercambios:
+```
+MiProyecto/
+├── Api/                # Controlador API con auth JWT (UsuarioApiController)
+├── Controllers/          # Carta, Coleccion, Compra, Intercambio, Pack, Usuario, Home
+├── Models/                 # Entidades + interfaces y repositorios (patrón Repository)
+├── Views/                    # Vistas Razor por controlador
+└── wwwroot/                    # Assets, imágenes de cartas/packs y script SQL de la base
+```
 
-Los usuarios pueden iniciar intercambios de cartas (hasta 5 cartas por usuario por intercambio).
-El oferente selecciona una carta o cartas de la colección del receptor .
-El receptor revisa el intercambio, puede aceptar (eligiendo cartas del oferente), rechazar o cancelar.
-El oferente confirma o cancela tras la aceptación del receptor.
-Si ambas partes confirman, las cartas se transfieren a las colecciones respectivas.
-las transacciones solo estan abiertas por tiempo limitado y solo peude haber una transaccion abierta por par de usuarios.
+El acceso a datos usa el **patrón Repository**: cada entidad tiene su interfaz (`IRepositorioX`) y su implementación (`RepositorioX`), inyectadas por dependencia en `Program.cs`.
 
+## 🚀 Cómo correrlo localmente
 
+### Requisitos previos
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- MySQL Server
 
-Colecciones:
+### Pasos
 
-Los usuarios pueden crear y gestionar colecciones de cartas.
-Las colecciones son públicas (visibles para otros)
-os usuarios comunes solo pueden ver detalles de cartas y colecciones públicas de otros usuarios.
+1. Cloná el repositorio:
+   ```bash
+   git clone https://github.com/RamonAlcaraz1987/TiendaCambiosCartasColeccionables.git
+   cd TiendaCambiosCartasColeccionables
+   ```
 
+2. Creá la base de datos y cargá el esquema incluido:
+   ```bash
+   mysql -u root -p < "wwwroot/Uploads/pokemoncartas (26).sql"
+   ```
 
+3. Configurá la cadena de conexión en `appsettings.json` con tus credenciales de MySQL:
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=localhost;Database=pokemoncartas;User=root;Password=TU_PASSWORD;"
+   }
+   ```
 
-Historial:
-Los usuarios pueden ver su propio historial de intercambios y compras.
+4. Restaurá dependencias y corré el proyecto:
+   ```bash
+   dotnet restore
+   dotnet run
+   ```
 
+5. Abrí `https://localhost:5001` (o el puerto que indique la consola) en tu navegador.
 
+> ⚠️ **Nota de seguridad**: el `Salt` y el `TokenAuthentication:SecretKey` están hardcodeados en `appsettings.json`. Antes de desplegar en producción, movelos a variables de entorno o a un gestor de secretos (`dotnet user-secrets` en desarrollo).
 
-Restricciones:
+## 📌 Estado del proyecto
 
+Funcionalidades core implementadas: tienda, colecciones, intercambios, packs y roles de usuario. Próximas mejoras sugeridas:
+- [ ] Mover credenciales sensibles a variables de entorno
+- [ ] Agregar tests automatizados
+- [ ] Documentar los endpoints de la API (Swagger/OpenAPI)
 
-Los usuarios comunes no pueden editar ni eliminar cartas, colecciones ni compras, solo visualizarlas.
-solo los administradores tienen control total sobre todas las entidades.
+## 👤 Autor
+
+**Ramón Alcaraz**
+[LinkedIn](https://www.linkedin.com/in/ramon-alcaraz-arg/) · [GitHub](https://github.com/RamonAlcaraz1987)

@@ -596,7 +596,7 @@ namespace MiProyecto.Models
                         }
                     }
 
-                    // Fetch cards for each intercambio
+                    // obtener las cartas de cada intercambio
                     foreach (var intercambio in intercambios)
                     {
                         
